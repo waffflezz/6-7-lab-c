@@ -1,12 +1,15 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <time.h>
 
-//15 вариант ОП
+//15 OP
+
 
 int main(void) {
     int *array;
     int array_len;
-    int start, end;
+
+    srand(time(NULL));
 
     printf("Enter max array len:");
     scanf("%d", &array_len);
@@ -24,7 +27,7 @@ int main(void) {
     printf("\n\n");
 
     int s1 = 0, f1 = 0;
-    int s2 = 0, f2 = 0, diff = 0;
+    int s2 = 0, f2, diff;
 
     for (int i = 1; i < array_len; ++i) {
         if (array[i] >= array[i - 1]) {
