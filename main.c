@@ -41,7 +41,6 @@ int main(void) {
 
                 break;
             case 2:
-                printf("%p\n", array);
                 if (array != NULL) {
                     sequence_border(array, array_len, &start, &end);
 
