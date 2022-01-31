@@ -29,6 +29,10 @@ int main(void) {
             case 1:
                 puts("Enter array len:");
                 array_len = input_int();
+                if (array_len == -1) {
+                    fputs("You enter incorrect value!\n", stderr);
+                    break;
+                }
 
                 if (array != NULL)
                     free(array);
@@ -44,7 +48,7 @@ int main(void) {
                 if (array != NULL) {
                     sequence_border(array, array_len, &start, &end);
 
-                    printf("Maximum non-decreasing sequence\n");
+                    printf("Maximum non-decreasing sequence:\n");
                     print_sequence(array, start, end);
                 } else {
                     fputs("First, specify the length of the array and fill it with numbers\n", stderr);
@@ -84,7 +88,6 @@ int input_int() {
     char str_array_len[MAX_INPUT_ARRAY_LEN];
     fgets(str_array_len, MAX_INPUT_ARRAY_LEN, stdin);
     if (!(input_int_check(str_array_len)) || strlen(str_array_len) == 1) {
-        fputs("You enter incorrect value!\n", stderr);
         return -1;
     }
 
