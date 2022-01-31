@@ -2,7 +2,7 @@
 #include <stdlib.h>
 #include <time.h>
 #include <string.h>
-#define MAX_ARRAY_LEN 11
+#define MAX_INPUT_ARRAY_LEN 11
 
 //15 OP
 void sequence_border(const int array[], int array_len, int *start, int *end);
@@ -16,9 +16,9 @@ int main(void) {
     //update seed for random function
     srand(time(NULL));
 
-    char str_array_len[MAX_ARRAY_LEN];
+    char str_array_len[MAX_INPUT_ARRAY_LEN];
     puts("Enter max array len:");
-    fgets(str_array_len, MAX_ARRAY_LEN, stdin);
+    fgets(str_array_len, MAX_INPUT_ARRAY_LEN, stdin);
     if (!(input_int_check(str_array_len))) {
         fputs("PIZDEC", stderr);
         exit(1);
