@@ -8,6 +8,7 @@
 void sequence_border(const int array[], int array_len, int *start, int *end);
 void print_sequence(int array[], int start, int end);
 int input_int_check(char value_array[]);
+int input_int();
 
 int main(void) {
     int *array;
@@ -16,16 +17,8 @@ int main(void) {
     //update seed for random function
     srand(time(NULL));
 
-    char str_array_len[MAX_INPUT_ARRAY_LEN];
     puts("Enter max array len:");
-    fgets(str_array_len, MAX_INPUT_ARRAY_LEN, stdin);
-    if (!(input_int_check(str_array_len))) {
-        fputs("PIZDEC", stderr);
-        exit(1);
-    }
-
-    array_len = strtol(str_array_len, NULL, 10);
-
+    array_len = input_int();
     array = malloc(array_len * sizeof(int));
 
     for (int i = 0; i < array_len; ++i) {
@@ -54,28 +47,42 @@ int main(void) {
 
     free(array);
 
+
+
+
     return 0;
 }
 
+int input_int() {
+    char str_array_len[MAX_INPUT_ARRAY_LEN];
+    fgets(str_array_len, MAX_INPUT_ARRAY_LEN, stdin);
+    if (!(input_int_check(str_array_len)) || strlen(str_array_len) == 1) {
+        fputs("You enter incorrect value. Please, enter integer!\n", stderr);
+        return -1;
+    }
+
+    return strtol(str_array_len, NULL, 10);
+}
+
 void sequence_border(const int array[], int array_len, int *start, int *end) {
-    int s1 = 0, f1 = 0;
-    int s2 = 0, f2, diff;
+    int start_ptr = 0, end_ptr = 0;
+    int next_start_ptr = 0, next_end_ptr, diff;
 
     for (int i = 1; i < array_len; ++i) {
         if (array[i] >= array[i - 1]) {
-            f2 = i;
-            diff = f2 - s2 + 1;
-            if (f1 - s1 + 1 <= diff) {
-                s1 = s2;
-                f1 = f2;
+            next_end_ptr = i;
+            diff = next_end_ptr - next_start_ptr + 1;
+            if (end_ptr - start_ptr + 1 <= diff) {
+                start_ptr = next_start_ptr;
+                end_ptr = next_end_ptr;
             }
         } else {
-            s2 = i;
+            next_start_ptr = i;
         }
     }
 
-    *start = s1;
-    *end = f1;
+    *start = start_ptr;
+    *end = end_ptr;
 }
 
 void print_sequence(int array[], int start, int end) {
