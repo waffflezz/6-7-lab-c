@@ -2,6 +2,8 @@
 #include <stdlib.h>
 #include <time.h>
 #include <string.h>
+#include <math.h>
+#define MAX_RANDOM_NUMBER 50
 #define MAX_INPUT_ARRAY_LEN 11
 
 //15 OP
@@ -40,7 +42,8 @@ int main(void) {
                 array = malloc(array_len * sizeof(int));
 
                 for (int i = 0; i < array_len; ++i) {
-                    array[i] = rand() % 20;
+                    array[i] = rand() % MAX_RANDOM_NUMBER * (int)pow(-1,
+                                                                     rand());
                 }
 
                 break;
@@ -51,7 +54,8 @@ int main(void) {
                     printf("Maximum non-decreasing sequence:\n");
                     print_sequence(array, start, end);
                 } else {
-                    fputs("First, specify the length of the array and fill it with numbers\n", stderr);
+                    fputs("First, specify the length of the array and "
+                          "fill it with numbers\n", stderr);
                 }
 
                 break;
@@ -70,7 +74,8 @@ int main(void) {
                         puts("...");
                     }
                 } else {
-                    fputs("First, specify the length of the array and fill it with numbers\n", stderr);
+                    fputs("First, specify the length of the array and fill "
+                          "it with numbers\n", stderr);
                 }
 
                 break;
@@ -88,7 +93,8 @@ int input_int() {
     char str_array_len[MAX_INPUT_ARRAY_LEN];
     fgets(str_array_len, MAX_INPUT_ARRAY_LEN, stdin);
     fflush(stdin);
-    if (!(input_int_check(str_array_len)) || strlen(str_array_len) == 1) {
+    if (!(input_int_check(str_array_len))
+        || strlen(str_array_len) == 1) {
         return -1;
     }
 
