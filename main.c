@@ -87,6 +87,7 @@ int main(void) {
 int input_int() {
     char str_array_len[MAX_INPUT_ARRAY_LEN];
     fgets(str_array_len, MAX_INPUT_ARRAY_LEN, stdin);
+    fflush(stdin);
     if (!(input_int_check(str_array_len)) || strlen(str_array_len) == 1) {
         return -1;
     }
