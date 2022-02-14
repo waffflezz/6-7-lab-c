@@ -45,7 +45,6 @@ int main(void) {
                     array[i] = rand() % MAX_RANDOM_NUMBER * (int)pow(-1,
                                                                      rand());
                 }
-
                 break;
             case 2:
                 if (array != NULL) {
@@ -57,18 +56,19 @@ int main(void) {
                     fputs("First, specify the length of the array and "
                           "fill it with numbers\n", stderr);
                 }
-
                 break;
             case 3:
                 if (array != NULL) {
+                    int max_numbers_print = 100;
+
                     puts("Numbers in massive:");
-                    if (array_len < 100) {
+                    if (array_len < max_numbers_print) {
                         for (int i = 0; i < array_len; ++i) {
                             printf("%d ", array[i]);
                         }
                         puts("");
                     } else {
-                        for (int i = 0; i < 100; ++i) {
+                        for (int i = 0; i < max_numbers_print; ++i) {
                             printf("%d ", array[i]);
                         }
                         puts("...");
@@ -77,11 +77,10 @@ int main(void) {
                     fputs("First, specify the length of the array and fill "
                           "it with numbers\n", stderr);
                 }
-
                 break;
             case 4:
                 free(array);
-                exit(0);
+                return 0;
             default:
                 fputs("Not in menu\n", stderr);
                 break;
