@@ -4,6 +4,7 @@
 
 #ifndef UNTITLED1_GAP_STRUCTS_H
 #define UNTITLED1_GAP_STRUCTS_H
+#include <stdlib.h>
 
 typedef enum {
     FALSE,
@@ -35,7 +36,7 @@ typedef struct {
 } gap;
 
 typedef struct _Node {
-    void *value;
+    gap value;
     struct _Node *next;
     struct _Node *prev;
 } Node;

@@ -10,13 +10,13 @@ void print_menu();
 
 void print_gap_submenu();
 
-void print_structs(gap *gap_array, gap *end_ptr);
+void print_structs(DblLinkedList *list);
 
-void add_gap(int gap_type, double left_dot, double right_dot, gap **end_ptr);
+void add_gap(int gap_type, double left_dot, double right_dot, DblLinkedList *list);
 
-void delete_gap(int gap_number, gap *gap_array, gap **end_ptr);
+void delete_gap(DblLinkedList *list, size_t index);
 
-int comparator(const void *tmp1, const void *tmp2);
+int comparator(void *tmp1, void *tmp2);
 
 void add_flag(unsigned char *flag, int gap_type);
 
@@ -36,6 +36,22 @@ DblLinkedList* createDblLinkedList();
 
 void deleteDblLinkedList(DblLinkedList **list);
 
+Node* getNth(DblLinkedList *list, size_t index);
+
+void pushFront(DblLinkedList *list, gap data);
+
+void pushBack(DblLinkedList *list, gap value);
+
+void insertBeforeElement(DblLinkedList *list, Node* elm, gap value);
+
+void insertionSort(DblLinkedList **list, int (*cmp)(void*, void*));
+
+gap popFront(DblLinkedList *list);
+
+void swap(Node *tmp1, Node *tmp2);
+
+void ReverseList(DblLinkedList *list);
+
 union {
     struct {
         unsigned char is_line: 1;
@@ -47,9 +63,7 @@ union {
 } Params;
 
 int main(void) {
-    size_t gap_size = sizeof(gap);
-    gap *gap_array = malloc(gap_size * MAX_GAP);
-    gap *end_ptr = gap_array;
+    DblLinkedList *list = createDblLinkedList();
 
     int menu_input;
     do {
@@ -58,7 +72,7 @@ int main(void) {
         menu_input = input_int();
         switch (menu_input) {
             case FIRST:
-                if ((end_ptr - gap_array) == MAX_GAP) {
+                if (list->size == MAX_GAP) {
                     printf("Array is full!");
                     break;
                 }
@@ -92,7 +106,7 @@ int main(void) {
                     right_dot = input_double();
                 }
 
-                add_gap(submenu_input, left_dot, right_dot, &end_ptr);
+                add_gap(submenu_input, left_dot, right_dot, list);
                 puts("");
 
                 break;
@@ -100,33 +114,30 @@ int main(void) {
                 puts("Enter struct number:");
                 int gap_number = input_int();
 
-                delete_gap(gap_number, gap_array, &end_ptr);
+                delete_gap(list, gap_number);
 
                 break;
             case THIRD:
-                print_structs(gap_array, end_ptr);
+                print_structs(list);
 
                 break;
             case FOUR:
                 field_input();
 
-                int num_of_elements = end_ptr - gap_array;
-
-                qsort(gap_array, num_of_elements, sizeof(gap),
-                      comparator);
+                insertionSort(&list, comparator);
 
                 clear_flags();
 
                 break;
             case FIVE:
-                field_input();
+                //field_input();
+                ReverseList(list);
+                // print_with_filter(gap_array, end_ptr);
 
-                print_with_filter(gap_array, end_ptr);
-
-                clear_flags();
+                //clear_flags();
                 break;
             case SIX:
-                free(gap_array);
+                deleteDblLinkedList(&list);
                 break;
         }
 
@@ -190,43 +201,93 @@ void field_input() {
     } while (TRUE);
 }
 
-void add_gap(int gap_type, double left_dot, double right_dot, gap **end_ptr) {
+DblLinkedList* createDblLinkedList() {
+    DblLinkedList *tmp = (DblLinkedList*) malloc(sizeof(DblLinkedList));
+    tmp->size = 0;
+    tmp->head = tmp->tail = NULL;
 
-
-    gap *end_p = *end_ptr;
-
-    end_p->gap_type = gap_type;
-    end_p->left_dot = left_dot;
-    end_p->right_dot = right_dot;
-
-    if (end_p->gap_type == LINE)
-        end_p->length = end_p->right_dot - end_p->left_dot;
-    else
-        end_p->length = 0;
-
-    (*end_ptr)++;
+    return tmp;
 }
 
-void delete_gap(int gap_number, gap *gap_array, gap **end_ptr) {
-    gap *end_p = *end_ptr;
+void deleteDblLinkedList(DblLinkedList **list) {
+    Node *tmp = (*list)->head;
+    Node *next = NULL;
+    while (tmp) {
+        next = tmp->next;
+        free(tmp);
+        tmp = next;
+    }
+    free(*list);
+    (*list) = NULL;
+}
 
-    int gap_count = end_p - gap_array;
+void add_gap(int gap_type, double left_dot, double right_dot, DblLinkedList *list) {
+    gap tmp_gap;
+    tmp_gap.gap_type = gap_type;
+    tmp_gap.left_dot = left_dot;
+    tmp_gap.right_dot = right_dot;
 
-    if (gap_number > gap_count || gap_number == 0) {
+    if (gap_type == LINE)
+        tmp_gap.length = right_dot - left_dot;
+
+    Node *tmp = (Node*) malloc(sizeof(Node));
+    if (tmp == NULL) {
+        exit(3);
+    }
+    tmp->value = tmp_gap;
+    tmp->next = NULL;
+    tmp->prev = list->tail;
+    if (list->tail) {
+        list->tail->next = tmp;
+    }
+    list->tail = tmp;
+
+    if (list->head == NULL) {
+        list->head = tmp;
+    }
+    list->size++;
+}
+
+Node* getNth(DblLinkedList *list, size_t index) {
+    Node *tmp = list->head;
+    size_t i = 0;
+
+    while (tmp && i < index) {
+        tmp = tmp->next;
+        i++;
+    }
+
+    return tmp;
+}
+
+void delete_gap(DblLinkedList *list, size_t index) {
+    Node *elm = NULL;
+    gap tmp;
+    elm = getNth(list, index);
+    if (elm == NULL) {
         puts("Incorrect value!");
         return;
     }
-
-    for (gap_array += gap_number - 1; gap_array != (end_p - 1); ++gap_array) {
-        gap next_gap = *(++gap_array);
-        --gap_array;
-        *gap_array = next_gap;
+    if (elm->prev) {
+        elm->prev->next = elm->next;
+    }
+    if (elm->next) {
+        elm->next->prev = elm->prev;
     }
 
-    (*end_ptr)--;
+    if (!elm->prev) {
+        list->head = elm->next;
+    }
+    if (!elm->next) {
+        list->tail = elm->prev;
+    }
+
+    free(elm);
+
+    list->size--;
 }
 
-int comparator(const void *tmp1, const void *tmp2) {
+int comparator(void *tmp1, void *tmp2) {
     gap *tm1 = (gap *) tmp1;
     gap *tm2 = (gap *) tmp2;
     int cmp;
@@ -254,6 +315,152 @@ int comparator(const void *tmp1, const void *tmp2) {
     return 0;
 }
 
+void pushFront(DblLinkedList *list, gap data) {
+    Node *tmp = (Node*) malloc(sizeof(Node));
+    if (tmp == NULL) {
+        exit(1);
+    }
+    tmp->value = data;
+    tmp->next = list->head;
+    tmp->prev = NULL;
+    if (list->head) {
+        list->head->prev = tmp;
+    }
+    list->head = tmp;
+
+    if (list->tail == NULL) {
+        list->tail = tmp;
+    }
+    list->size++;
+}
+
+gap popFront(DblLinkedList *list) {
+    Node *prev;
+    gap tmp;
+    if (list->head == NULL) {
+        exit(2);
+    }
+
+    prev = list->head;
+    list->head = list->head->next;
+    if (list->head) {
+        list->head->prev = NULL;
+    }
+    if (prev == list->tail) {
+        list->tail = NULL;
+    }
+    tmp = prev->value;
+    free(prev);
+
+    list->size--;
+    return tmp;
+}
+
+void pushBack(DblLinkedList *list, gap value) {
+    Node *tmp = (Node*) malloc(sizeof(Node));
+    if (tmp == NULL) {
+        exit(3);
+    }
+    tmp->value = value;
+    tmp->next = NULL;
+    tmp->prev = list->tail;
+    if (list->tail) {
+        list->tail->next = tmp;
+    }
+    list->tail = tmp;
+
+    if (list->head == NULL) {
+        list->head = tmp;
+    }
+    list->size++;
+}
+
+void insertBeforeElement(DblLinkedList *list, Node* elm, gap value) {
+    Node *ins = NULL;
+    if (elm == NULL) {
+        exit(6);
+    }
+
+    if (!elm->prev) {
+        pushFront(list, value);
+        return;
+    }
+    ins = (Node*) malloc(sizeof(Node));
+    ins->value = value;
+    ins->prev = elm->prev;
+    elm->prev->next = ins;
+    ins->next = elm;
+    elm->prev = ins;
+
+    list->size++;
+}
+
+void insertionSort(DblLinkedList **list, int (*cmp)(void*, void*)) {
+    DblLinkedList *out = createDblLinkedList();
+    Node *sorted = NULL;
+    Node *unsorted = NULL;
+
+    pushFront(out, popFront(*list));
+
+    unsorted = (*list)->head;
+    while (unsorted) {
+        sorted = out->head;
+        while (sorted && !cmp(&(unsorted->value), &(sorted->value))) {
+            sorted = sorted->next;
+        }
+        if (sorted) {
+            insertBeforeElement(out, sorted, unsorted->value);
+        } else {
+            pushBack(out, unsorted->value);
+        }
+        unsorted = unsorted->next;
+    }
+
+    free(*list);
+    *list = out;
+}
+
+void swap(Node **first, Node **second) {
+    Node *tmp = *first;
+    *first = *second;
+    *second = tmp;
+}
+
+void swapNodes(DblLinkedList *list, int key1, int key2) {
+    if ( key1 == key2 ) return;
+
+    Node **first = &(list->head);
+
+    while ( *first && ( *first )->value != (getNth(list, key1))->value ) first = &( *first )->next;
+
+    if ( *first == NULL ) return;
+
+    Node **second = headr;
+
+    while ( *second && ( *second )->value != key2 ) second = &( *second )->next;
+
+    if ( *second == NULL ) return;
+
+    swap( first, second );
+    swap( &( *first )->next, &( *second )->next );
+}
+
+void ReverseList(DblLinkedList *list) {
+    Node *p = list->head;
+
+    while (p != list->tail)
+    {
+        Node *next = p->next;
+
+        swap(p->next, p->prev);
+
+        p = next;
+    }
+
+    //swap(list->head->next, list->tail->prev);
+    //swap(list->head->next->prev, list->tail->prev->next);
+}
+
 void print_with_filter(gap *gap_array, gap *end_ptr) {
     for (; gap_array != end_ptr; ++gap_array) {
         if (Params.is_line) {
@@ -269,32 +476,39 @@ void print_with_filter(gap *gap_array, gap *end_ptr) {
     }
 }
 
-void print_structs(gap *gap_array, gap *end_ptr) {
-    if (gap_array == end_ptr) {
+void print_structs(DblLinkedList *list) {
+    if (list->size == 0) {
         puts("There are no structures :c");
         return;
     }
 
-    for (int i = 1; gap_array != end_ptr; ++gap_array, ++i) {
-        printf("Struct number: %d\n", i);
+    Node *tmp = list->head;
+    int i = 0;
+
+    while (tmp) {
+        printf("Struct index: %d\n", i);
         printf("Type: ");
-        print_type_string(gap_array->gap_type);
+        print_type_string(tmp->value.gap_type);
 
-        if (gap_array->gap_type == LINE)
-            printf("Length: %.3f\n", gap_array->length);
+        if (tmp->value.gap_type == LINE)
+            printf("Length: %.3f\n", tmp->value.length);
 
-        if (gap_array->left_dot == DBL_MIN) {
+        if (tmp->value.left_dot == DBL_MIN) {
             printf("Left dot: infinity\n");
         } else {
-            printf("Left dot: %.3f\n", gap_array->left_dot);
+            printf("Left dot: %.3f\n", tmp->value.left_dot);
         }
 
-        if (gap_array->right_dot == DBL_MAX) {
+        if (tmp->value.right_dot == DBL_MAX) {
             printf("Right dot: infinity\n\n");
         } else {
-            printf("Right dot: %.3f\n\n", gap_array->right_dot);
+            printf("Right dot: %.3f\n\n", tmp->value.right_dot);
         }
+
+        tmp = tmp->next;
+        ++i;
     }
+
     puts("");
 }
 
