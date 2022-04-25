@@ -52,6 +52,10 @@ void swap(Node* node);
 
 void reverseDDL(DblLinkedList *list);
 
+int save(DblLinkedList *list);
+
+int load();
+
 union {
     struct {
         unsigned char is_line: 1;
@@ -135,20 +139,33 @@ int main(void) {
                 print_with_filter(list);
 
                 clear_flags();
+
                 break;
             case SIX:
                 reverseDDL(list);
                 puts("List reversed");
+
                 break;
             case SEVEN:
+                save(list);
+                puts("List saved");
+
+                break;
+            case EIGHT:
+                load();
+
+                break;
+            case NINE:
                 deleteDblLinkedList(&list);
+
                 break;
             default:
                 puts("Incorrect value!");
+
                 break;
         }
 
-    } while (menu_input != SEVEN);
+    } while (menu_input != NINE);
 
     return 0;
 }
@@ -449,6 +466,77 @@ void reverseDDL(DblLinkedList *list) {
     }
 }
 
+int save(DblLinkedList *list) {
+    size_t n = list->size;
+    gap *st = (gap *) malloc(n * sizeof(gap));
+
+    Node *tmp = list->head;
+    int j = 0;
+    while (tmp) {
+        st[j] = tmp->value;
+
+        ++j;
+        tmp = tmp->next;
+    }
+
+    FILE *fp = fopen("gap_s.dat", "w");
+    char *c;
+
+    int size = n * sizeof(gap);
+
+    c = (char *) &n;
+    for (int i = 0; i < sizeof(int); ++i) {
+        putc(*c++, fp);
+    }
+
+    c = (char *) st;
+    for (int i = 0; i < size; ++i) {
+        putc(*c, fp);
+        c++;
+    }
+    fclose(fp);
+    free(st);
+    return 0;
+}
+
+int load() {
+    FILE *fp = fopen("gap_s.dat", "r");
+    char *c;
+    int m = sizeof(int);
+    int n, i;
+
+    int *pti = (int *) malloc(m);
+
+    c = (char *) pti;
+    while (m > 0) {
+        i = getc(fp);
+        if (i == EOF) break;
+        *c = i;
+        c++;
+        m--;
+    }
+    n = *pti;
+
+    gap *ptr = (gap *) malloc(n * sizeof(gap));
+    c = (char *) ptr;
+    while ((i = getc(fp)) != EOF) {
+        *c = i;
+        c++;
+    }
+
+    for (int k = 0; k < n; ++k) {
+        print_type_string((ptr + k)->gap_type);
+        printf("Left dot: %.3f\nRight dot: %.3f\n", (ptr + k)->left_dot,
+               (ptr + k)->right_dot);
+        puts("");
+    }
+
+    free(pti);
+    free(ptr);
+    fclose(fp);
+    return 0;
+}
+
 void print_with_filter(DblLinkedList *list) {
     Node *tmp = list->head;
 
@@ -511,7 +599,9 @@ void print_menu() {
     puts("4. Sort gaps");
     puts("5. Filter");
     puts("6. Reversed list");
-    puts("7. Exit");
+    puts("7. Save list");
+    puts("8. Load list (print)");
+    puts("9. Exit");
     puts("");
 }
 

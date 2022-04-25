@@ -26,7 +26,9 @@ typedef enum {
     FOUR,
     FIVE,
     SIX,
-    SEVEN
+    SEVEN,
+    EIGHT,
+    NINE
 } menu_items;
 
 typedef struct {
