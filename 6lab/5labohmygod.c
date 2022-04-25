@@ -30,7 +30,7 @@ void clear_flags();
 
 void print_fields();
 
-void print_with_filter(gap *gap_array, gap *end_ptr);
+void print_with_filter(DblLinkedList *list);
 
 DblLinkedList* createDblLinkedList();
 
@@ -48,9 +48,9 @@ void insertionSort(DblLinkedList **list, int (*cmp)(void*, void*));
 
 gap popFront(DblLinkedList *list);
 
-void swap(Node *tmp1, Node *tmp2);
+void swap(Node* node);
 
-void ReverseList(DblLinkedList *list);
+void reverseDDL(DblLinkedList *list);
 
 union {
     struct {
@@ -130,18 +130,25 @@ int main(void) {
 
                 break;
             case FIVE:
-                //field_input();
-                ReverseList(list);
-                // print_with_filter(gap_array, end_ptr);
+                field_input();
 
-                //clear_flags();
+                print_with_filter(list);
+
+                clear_flags();
                 break;
             case SIX:
+                reverseDDL(list);
+                puts("List reversed");
+                break;
+            case SEVEN:
                 deleteDblLinkedList(&list);
+                break;
+            default:
+                puts("Incorrect value!");
                 break;
         }
 
-    } while (menu_input != SIX);
+    } while (menu_input != SEVEN);
 
     return 0;
 }
@@ -262,7 +269,6 @@ Node* getNth(DblLinkedList *list, size_t index) {
 
 void delete_gap(DblLinkedList *list, size_t index) {
     Node *elm = NULL;
-    gap tmp;
     elm = getNth(list, index);
     if (elm == NULL) {
         puts("Incorrect value!");
@@ -420,59 +426,45 @@ void insertionSort(DblLinkedList **list, int (*cmp)(void*, void*)) {
     *list = out;
 }
 
-void swap(Node **first, Node **second) {
-    Node *tmp = *first;
-    *first = *second;
-    *second = tmp;
+void swap(Node* node) {
+    Node* prev = node->prev;
+    node->prev = node->next;
+    node->next = prev;
 }
 
-void swapNodes(DblLinkedList *list, int key1, int key2) {
-    if ( key1 == key2 ) return;
+void reverseDDL(DblLinkedList *list) {
+    Node* prev = NULL;
+    Node* curr = list->head;
 
-    Node **first = &(list->head);
+    while (curr != NULL) {
+        swap(curr);
 
-    while ( *first && ( *first )->value != (getNth(list, key1))->value ) first = &( *first )->next;
+        prev = curr;
 
-    if ( *first == NULL ) return;
-
-    Node **second = headr;
-
-    while ( *second && ( *second )->value != key2 ) second = &( *second )->next;
-
-    if ( *second == NULL ) return;
-
-    swap( first, second );
-    swap( &( *first )->next, &( *second )->next );
-}
-
-void ReverseList(DblLinkedList *list) {
-    Node *p = list->head;
-
-    while (p != list->tail)
-    {
-        Node *next = p->next;
-
-        swap(p->next, p->prev);
-
-        p = next;
+        curr = curr->prev;
     }
 
-    //swap(list->head->next, list->tail->prev);
-    //swap(list->head->next->prev, list->tail->prev->next);
+    if (prev != NULL) {
+        list->head = prev;
+    }
 }
 
-void print_with_filter(gap *gap_array, gap *end_ptr) {
-    for (; gap_array != end_ptr; ++gap_array) {
+void print_with_filter(DblLinkedList *list) {
+    Node *tmp = list->head;
+
+    while (tmp) {
         if (Params.is_line) {
             printf("Type: ");
-            print_type_string(gap_array->gap_type);
+            print_type_string(tmp->value.gap_type);
         }
         if (Params.is_left_dot)
-            printf("Left dot: %.3f\n", gap_array->left_dot);
+            printf("Left dot: %.3f\n", tmp->value.left_dot);
         if (Params.is_right_dot)
-            printf("Right dot: %.3f\n", gap_array->right_dot);
-        if (Params.is_length && gap_array->gap_type == LINE)
-            printf("Length: %.3f\n", gap_array->length);
+            printf("Right dot: %.3f\n", tmp->value.right_dot);
+        if (Params.is_length && tmp->value.gap_type == LINE)
+            printf("Length: %.3f\n", tmp->value.length);
+
+        tmp = tmp->next;
     }
 }
 
@@ -518,7 +510,8 @@ void print_menu() {
     puts("3. Print gaps");
     puts("4. Sort gaps");
     puts("5. Filter");
-    puts("6. Exit");
+    puts("6. Reversed list");
+    puts("7. Exit");
     puts("");
 }
 
