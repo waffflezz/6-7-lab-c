@@ -4,8 +4,6 @@
 #include "gap_structs.h"
 #include "input_functions.h"
 
-#define MAX_GAP 1000
-
 void print_menu();
 
 void print_gap_submenu();
@@ -76,11 +74,6 @@ int main(void) {
         menu_input = input_int();
         switch (menu_input) {
             case FIRST:
-                if (list->size == MAX_GAP) {
-                    printf("Array is full!");
-                    break;
-                }
-
                 print_gap_submenu();
                 puts("Enter type of gap:");
                 int submenu_input = input_int();
