@@ -30,25 +30,25 @@ void print_fields();
 
 void print_with_filter(DblLinkedList *list);
 
-DblLinkedList* createDblLinkedList();
+DblLinkedList* create_dblLinkedList();
 
-void deleteDblLinkedList(DblLinkedList **list);
+void delete_dblLinkedList(DblLinkedList **list);
 
-Node* getNth(DblLinkedList *list, size_t index);
+Node* get_node(DblLinkedList *list, size_t index);
 
-void pushFront(DblLinkedList *list, gap data);
+void push_front(DblLinkedList *list, gap data);
 
-void pushBack(DblLinkedList *list, gap value);
+void push_back(DblLinkedList *list, gap value);
 
-void insertBeforeElement(DblLinkedList *list, Node* elm, gap value);
+void insert_before_element(DblLinkedList *list, Node* elm, gap value);
 
-void insertionSort(DblLinkedList **list, int (*cmp)(void*, void*));
+void insertion_sort(DblLinkedList **list, int (*cmp)(void*, void*));
 
-gap popFront(DblLinkedList *list);
+gap pop_front(DblLinkedList *list);
 
 void swap(Node* node);
 
-void reverseDDL(DblLinkedList *list);
+void reverse_DDL(DblLinkedList *list);
 
 int save(DblLinkedList *list);
 
@@ -65,7 +65,7 @@ union {
 } Params;
 
 int main(void) {
-    DblLinkedList *list = createDblLinkedList();
+    DblLinkedList *list = create_dblLinkedList();
 
     int menu_input;
     do {
@@ -121,7 +121,7 @@ int main(void) {
             case FOUR:
                 field_input();
 
-                insertionSort(&list, comparator);
+                insertion_sort(&list, comparator);
 
                 clear_flags();
 
@@ -135,7 +135,7 @@ int main(void) {
 
                 break;
             case SIX:
-                reverseDDL(list);
+                reverse_DDL(list);
                 puts("List reversed");
 
                 break;
@@ -149,7 +149,7 @@ int main(void) {
 
                 break;
             case NINE:
-                deleteDblLinkedList(&list);
+                delete_dblLinkedList(&list);
 
                 break;
             default:
@@ -218,7 +218,7 @@ void field_input() {
     } while (TRUE);
 }
 
-DblLinkedList* createDblLinkedList() {
+DblLinkedList* create_dblLinkedList() {
     DblLinkedList *tmp = (DblLinkedList*) malloc(sizeof(DblLinkedList));
     tmp->size = 0;
     tmp->head = tmp->tail = NULL;
@@ -226,7 +226,7 @@ DblLinkedList* createDblLinkedList() {
     return tmp;
 }
 
-void deleteDblLinkedList(DblLinkedList **list) {
+void delete_dblLinkedList(DblLinkedList **list) {
     Node *tmp = (*list)->head;
     Node *next = NULL;
     while (tmp) {
@@ -265,7 +265,7 @@ void add_gap(int gap_type, double left_dot, double right_dot, DblLinkedList *lis
     list->size++;
 }
 
-Node* getNth(DblLinkedList *list, size_t index) {
+Node* get_node(DblLinkedList *list, size_t index) {
     Node *tmp = list->head;
     size_t i = 0;
 
@@ -279,7 +279,7 @@ Node* getNth(DblLinkedList *list, size_t index) {
 
 void delete_gap(DblLinkedList *list, size_t index) {
     Node *elm = NULL;
-    elm = getNth(list, index);
+    elm = get_node(list, index);
     if (elm == NULL) {
         puts("Incorrect value!");
         return;
@@ -331,7 +331,7 @@ int comparator(void *tmp1, void *tmp2) {
     return 0;
 }
 
-void pushFront(DblLinkedList *list, gap data) {
+void push_front(DblLinkedList *list, gap data) {
     Node *tmp = (Node*) malloc(sizeof(Node));
     if (tmp == NULL) {
         exit(1);
@@ -350,7 +350,7 @@ void pushFront(DblLinkedList *list, gap data) {
     list->size++;
 }
 
-gap popFront(DblLinkedList *list) {
+gap pop_front(DblLinkedList *list) {
     Node *prev;
     gap tmp;
     if (list->head == NULL) {
@@ -372,7 +372,7 @@ gap popFront(DblLinkedList *list) {
     return tmp;
 }
 
-void pushBack(DblLinkedList *list, gap value) {
+void push_back(DblLinkedList *list, gap value) {
     Node *tmp = (Node*) malloc(sizeof(Node));
     if (tmp == NULL) {
         exit(3);
@@ -391,14 +391,14 @@ void pushBack(DblLinkedList *list, gap value) {
     list->size++;
 }
 
-void insertBeforeElement(DblLinkedList *list, Node* elm, gap value) {
+void insert_before_element(DblLinkedList *list, Node* elm, gap value) {
     Node *ins = NULL;
     if (elm == NULL) {
         exit(6);
     }
 
     if (!elm->prev) {
-        pushFront(list, value);
+        push_front(list, value);
         return;
     }
     ins = (Node*) malloc(sizeof(Node));
@@ -411,12 +411,12 @@ void insertBeforeElement(DblLinkedList *list, Node* elm, gap value) {
     list->size++;
 }
 
-void insertionSort(DblLinkedList **list, int (*cmp)(void*, void*)) {
-    DblLinkedList *out = createDblLinkedList();
+void insertion_sort(DblLinkedList **list, int (*cmp)(void*, void*)) {
+    DblLinkedList *out = create_dblLinkedList();
     Node *sorted = NULL;
     Node *unsorted = NULL;
 
-    pushFront(out, popFront(*list));
+    push_front(out, pop_front(*list));
 
     unsorted = (*list)->head;
     while (unsorted) {
@@ -425,9 +425,9 @@ void insertionSort(DblLinkedList **list, int (*cmp)(void*, void*)) {
             sorted = sorted->next;
         }
         if (sorted) {
-            insertBeforeElement(out, sorted, unsorted->value);
+            insert_before_element(out, sorted, unsorted->value);
         } else {
-            pushBack(out, unsorted->value);
+            push_back(out, unsorted->value);
         }
         unsorted = unsorted->next;
     }
@@ -442,7 +442,7 @@ void swap(Node* node) {
     node->next = prev;
 }
 
-void reverseDDL(DblLinkedList *list) {
+void reverse_DDL(DblLinkedList *list) {
     Node* prev = NULL;
     Node* curr = list->head;
 
